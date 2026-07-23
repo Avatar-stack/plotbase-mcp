@@ -1,5 +1,5 @@
 """
-Generate WeChat Official Article in DOCX format for PlotBase MCP with embedded images.
+Generate WeChat Official Article in DOCX format for PlotBase MCP with embedded images & contribution notice.
 """
 
 import os
@@ -38,7 +38,6 @@ def add_code_block(doc, code_text):
     set_cell_background(cell, "F4F6F8")
     set_cell_margins(cell, top=140, bottom=140, left=200, right=200)
     
-    # Left border in Teal (#0D9488)
     tcPr = cell._tc.get_or_add_tcPr()
     tcBorders = parse_xml(
         f'<w:tcBorders {nsdecls("w")}>'
@@ -64,21 +63,21 @@ def add_code_block(doc, code_text):
     p_after.paragraph_format.space_before = Pt(0)
     p_after.paragraph_format.space_after = Pt(6)
 
-def add_callout_box(doc, title, text):
-    """Add a highlighted callout box for key takeaways."""
+def add_callout_box(doc, title, text, border_color="0284C7", bg_color="F0F9FF", title_color="0369A1"):
+    """Add a highlighted callout box for key takeaways or announcements."""
     tbl = doc.add_table(rows=1, cols=1)
     tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
     tbl.autofit = False
     
     cell = tbl.cell(0, 0)
     cell.width = Inches(6.5)
-    set_cell_background(cell, "F0F9FF")
+    set_cell_background(cell, bg_color)
     set_cell_margins(cell, top=140, bottom=140, left=200, right=200)
     
     tcPr = cell._tc.get_or_add_tcPr()
     tcBorders = parse_xml(
         f'<w:tcBorders {nsdecls("w")}>'
-        f'<w:left w:val="single" w:sz="24" w:space="0" w:color="0284C7"/>'
+        f'<w:left w:val="single" w:sz="24" w:space="0" w:color="{border_color}"/>'
         f'<w:top w:val="none"/>'
         f'<w:right w:val="none"/>'
         f'<w:bottom w:val="none"/>'
@@ -94,7 +93,7 @@ def add_callout_box(doc, title, text):
     run_title.font.name = 'Arial'
     run_title.font.bold = True
     run_title.font.size = Pt(11)
-    run_title.font.color.rgb = RGBColor(0x03, 0x69, 0xA1)
+    run_title.font.color.rgb = RGBColor.from_string(title_color)
 
     run_text = p.add_run(text)
     run_text.font.name = '宋体'
@@ -168,11 +167,20 @@ def build_document():
     # Meta banner
     p_meta = doc.add_paragraph()
     p_meta.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_meta.paragraph_format.space_after = Pt(24)
+    p_meta.paragraph_format.space_after = Pt(18)
     r_meta = p_meta.add_run("作者：Antigravity AI Team | GitHub 开源项目 | 阅读时间：约 8 分钟")
     r_meta.font.name = 'Arial'
     r_meta.font.size = Pt(9.5)
     r_meta.font.color.rgb = RGBColor(0x71, 0x80, 0x96)
+
+    # Notice callout at top
+    add_callout_box(
+        doc,
+        "补充说明 & 示例征集 (Call for Examples)",
+        "📢 PlotBase 的图表制作档案库目前仍处于【持续完善与扩充中】！\n"
+        "我们极其欢迎广大科研人员、数据分析师与开源爱好者共同建设。如果你手头有高质量的 R/Python 绘图代码、顶刊配色模版或特定图表的 Agent 微调经验，非常欢迎提交示例与建议！",
+        border_color="D97706", bg_color="FFFBEB", title_color="B45309" # Warm Amber
+    )
 
     # Separator
     p_sep = doc.add_paragraph()
@@ -226,7 +234,6 @@ def build_document():
 
     doc.add_paragraph("PlotBase MCP 数据库将科研图表抽象为包含 5 个核心维度的结构化档案：")
 
-    # Embed Architecture Diagram
     add_image_with_caption(
         doc,
         "/tmp/plotbase_mcp/images/fig1_architecture.png",
@@ -234,7 +241,6 @@ def build_document():
         width=Inches(6.0)
     )
 
-    # Table for 5 dimensions
     table = doc.add_table(rows=6, cols=3)
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = False
@@ -408,9 +414,9 @@ plt.tight_layout()"""
 }"""
     add_code_block(doc, code_mcp_config)
 
-    # Section 5: 总结
+    # Section 5: 总结与示例征集
     h5 = doc.add_paragraph()
-    r_h5 = h5.add_run("五、总结与开源致谢")
+    r_h5 = h5.add_run("五、总结与示例征集致谢")
     r_h5.font.name = '微软雅黑'
     r_h5.font.bold = True
     r_h5.font.size = Pt(15)
@@ -423,17 +429,21 @@ plt.tight_layout()"""
     )
     p_end.paragraph_format.space_after = Pt(12)
 
+    # Final callout for community contribution
     add_callout_box(
         doc,
-        "GitHub 开源仓库信息",
-        "欢迎 Star、Fork 并贡献你的专属科研图表制作档案！\n"
-        "🔗 GitHub 项目地址：https://github.com/Avatar-stack/plotbase-mcp\n"
-        "许可协议：MIT License"
+        "欢迎提交示例与共同建设",
+        "目前 PlotBase 记忆库的案例还在持续完善与扩充中！欢迎广大科研作者与开发者提供高质量绘图示例：\n"
+        "• 提交 PR 添加全新的 R/Python 制作档案；\n"
+        "• 提交 Issue 推荐优雅的配色规则与 Agent 调优经验。\n\n"
+        "🔗 GitHub 开源项目地址：https://github.com/Avatar-stack/plotbase-mcp\n"
+        "开源许可：MIT License",
+        border_color="0D9488", bg_color="F0FDF4", title_color="0F766E"
     )
 
     output_path = "/tmp/plotbase_mcp/PlotBase_MCP_微信公众号文章.docx"
     doc.save(output_path)
-    print(f"Successfully generated DOCX document with embedded images at {output_path}")
+    print(f"Successfully updated DOCX document with contribution notice at {output_path}")
 
 if __name__ == "__main__":
     build_document()

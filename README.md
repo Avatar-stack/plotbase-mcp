@@ -6,6 +6,13 @@
 
 ---
 
+## 📢 补充说明与示例征集 (Call for Examples)
+
+> **PlotBase 的图表制作档案库目前仍处于【持续完善与扩充中】！**  
+> 如果你在日常科研或工程中探索出了优雅的 R / Python 绘图代码、顶刊配色方案或特定图表的 Agent 微调 Prompt，**极其欢迎提交 Issue 或 PR 贡献示例**！我们将把你的优质模板加入到 PlotBase 的标准制作档案库中，帮助更多科研人告别绘图痛点。
+
+---
+
 ## 📖 项目简介
 
 `PlotBase-FigureMemory` 是一个专门面向 AI Agent、大语言模型以及科研人员的 **Model Context Protocol (MCP) 服务**。
@@ -65,7 +72,7 @@ pip install "mcp[cli]"
 
 ### 2. 部署与测试
 
-你可以直接在本地终端运行测试套件：
+你可以直接在终端运行测试套件：
 
 ```bash
 python3 /tmp/plotbase_mcp/test_server.py
@@ -133,6 +140,8 @@ python3 /tmp/plotbase_mcp/test_server.py
 ├── server.py         # FastMCP 服务核心实现 (Tools, Resources, Prompts)
 ├── database.json     # 图表制作档案数据库 (含示例图表)
 ├── test_server.py    # 自动化单元测试套件
+├── generate_plots.py # DOCX 示例图表与架构图生成脚本
+├── images/           # 嵌入 DOCX 的高分辨率科研示意图
 └── README.md         # MCP 服务使用说明文档
 ```
 
