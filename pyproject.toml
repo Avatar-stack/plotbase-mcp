@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plotbase-mcp"
+version = "1.0.0"
+description = "PlotBase (Figure Memory) MCP Server - 科研图表档案与 Agent 上下文管理系统 MCP 服务"
+readme = "README.md"
+authors = [{ name = "qi-shen" }]
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp[cli]>=1.2.0"
+]
+
+[tool.setuptools]
+py-modules = ["server"]
+
+[project.scripts]
+plotbase-mcp = "server:mcp.run"

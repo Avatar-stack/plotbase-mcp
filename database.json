@@ -1,0 +1,462 @@
+{
+  "categories": [
+    {
+      "name": "类别比较",
+      "count": 346,
+      "subcategories": [
+        {
+          "name": "箱线图",
+          "count": 56
+        },
+        {
+          "name": "小提琴图",
+          "count": 36
+        },
+        {
+          "name": "柱状图",
+          "count": 171
+        },
+        {
+          "name": "云雨图",
+          "count": 7
+        },
+        {
+          "name": "气泡热图",
+          "count": 125
+        },
+        {
+          "name": "棒棒糖图",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "name": "数据关系",
+      "count": 485,
+      "subcategories": [
+        {
+          "name": "热图",
+          "count": 180
+        },
+        {
+          "name": "散点图",
+          "count": 256
+        },
+        {
+          "name": "网络图",
+          "count": 99
+        },
+        {
+          "name": "桑基图",
+          "count": 4
+        },
+        {
+          "name": "和弦图",
+          "count": 35
+        },
+        {
+          "name": "相关性图",
+          "count": 37
+        }
+      ]
+    },
+    {
+      "name": "组学研究",
+      "count": 233,
+      "subcategories": [
+        {
+          "name": "火山图",
+          "count": 26
+        },
+        {
+          "name": "富集分析",
+          "count": 64
+        },
+        {
+          "name": "单细胞图",
+          "count": 112
+        },
+        {
+          "name": "系统发育树",
+          "count": 43
+        },
+        {
+          "name": "染色体分布图",
+          "count": 15
+        },
+        {
+          "name": "曼哈顿图",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "name": "数据分布",
+      "count": 73,
+      "subcategories": [
+        {
+          "name": "山脊图",
+          "count": 6
+        },
+        {
+          "name": "密度图",
+          "count": 46
+        },
+        {
+          "name": "三元相图",
+          "count": 5
+        },
+        {
+          "name": "雷达图",
+          "count": 14
+        }
+      ]
+    }
+  ],
+  "figures": [
+    {
+      "id": "fig_ridge_ggplot2_01",
+      "title": "ggplot2优雅绘制山脊图(进阶版20230208)",
+      "category": "数据分布",
+      "chart_type": "山脊图",
+      "framework": "R",
+      "packages": [
+        "ggplot2",
+        "ggridges",
+        "viridis",
+        "hrbrthemes"
+      ],
+      "tags": [
+        "山脊图",
+        "数据分布",
+        "多组分布",
+        "进阶图表"
+      ],
+      "description": "基于 ggridges 绘制的多组连续变量分布山脊图，包含自定义渐变颜色映射与透明度叠加效果。",
+      "code": "library(ggplot2)\nlibrary(ggridges)\nlibrary(viridis)\n\n# 生成示例数据或加载数据\ndf <- read.csv(\"sample_density_data.csv\")\n\n# 绘制山脊图\nggplot(df, aes(x = value, y = group, fill = ..x..)) +\n  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) +\n  scale_fill_viridis(name = \"Value\", option = \"C\") +\n  labs(title = '多组连续数据分布山脊图',\n       subtitle = '基于 ggridges 与 viridis 色盘',\n       x = '测定值 (Value)', y = '分组 (Group)') +\n  theme_ridges(font_size = 13, grid = TRUE) +\n  theme(\n    legend.position = \"right\",\n    panel.spacing = unit(0.1, \"lines\"),\n    strip.text.x = element_text(size = 8)\n  )",
+      "sample_data": {
+        "format": "csv",
+        "columns": [
+          "group",
+          "value"
+        ],
+        "preview": [
+          {
+            "group": "Group_A",
+            "value": 12.4
+          },
+          {
+            "group": "Group_A",
+            "value": 14.1
+          },
+          {
+            "group": "Group_B",
+            "value": 22.8
+          },
+          {
+            "group": "Group_C",
+            "value": 18.3
+          }
+        ]
+      },
+      "visual_rules": {
+        "palette": "viridis (C-Option) / Magma",
+        "font_family": "Arial / Sans",
+        "aspect_ratio": "4:3",
+        "theme": "theme_ridges",
+        "guidelines": "1. y轴分组需按生物学顺序或中位数排序；2. scale参数控制峰高重叠程度；3. 渐变填充适合表达分布区间演变。"
+      },
+      "agent_context": "【Agent 绘图上下文与修改指导】\n1. 当用户数据包含多个平行处理组（>3组）且需展现连续分布趋势时，优先推荐此图。\n2. 数据列映射：x 映射到连续数值列（如表达量、表达强度），y 映射到离散分组列。\n3. 若组别过多，建议通过 scale_fill_viridis 的 option 控制颜色区分度，或者调整 scale (1.5 ~ 3.5) 防止图像过于拥挤。"
+    },
+    {
+      "id": "fig_monocle2_heatmap_02",
+      "title": "2023-3-29 ggplot修饰monocle2拟时热图",
+      "category": "数据关系",
+      "chart_type": "热图",
+      "framework": "R",
+      "packages": [
+        "monocle",
+        "pheatmap",
+        "viridis",
+        "gridExtra"
+      ],
+      "tags": [
+        "热图",
+        "拟时序",
+        "单细胞",
+        "Monocle2",
+        "基因动态表达"
+      ],
+      "description": "展示单细胞RNA-seq拟时序发育轨迹中差异表达基因的渐变热图，带有细胞拟时状态与分支注释。",
+      "code": "library(monocle)\nlibrary(pheatmap)\n\n# 提取拟时差异基因\nsig_gene_names <- row.names(subset(diff_test_res, qval < 0.01))\n\n# 绘制 monocle2 拟时序热图\nplot_pseudotime_heatmap(\n  cds[sig_gene_names,],\n  num_clusters = 4,\n  cores = 4,\n  show_rownames = TRUE,\n  return_heatmap = TRUE\n)",
+      "sample_data": {
+        "format": "rds / SingleCellExperiment",
+        "columns": [
+          "gene_id",
+          "pseudotime",
+          "cell_state",
+          "expression"
+        ],
+        "preview": [
+          {
+            "gene_id": "CD4",
+            "pseudotime": 0.12,
+            "cell_state": "State_1",
+            "expression": 2.5
+          },
+          {
+            "gene_id": "FOXP3",
+            "pseudotime": 0.85,
+            "cell_state": "State_3",
+            "expression": 8.1
+          }
+        ]
+      },
+      "visual_rules": {
+        "palette": "Navy-White-Firebrick (Custom Red-Blue gradient)",
+        "font_family": "Helvetica",
+        "aspect_ratio": "16:9",
+        "theme": "pheatmap_default",
+        "guidelines": "1. 表达量数据需做 Z-score 标准化；2. 聚类树应标注关键差异基因模块；3. 顶部需带有拟时序 (Pseudotime) 渐变色条。"
+      },
+      "agent_context": "【Agent 绘图上下文与修改指导】\n1. 用于单细胞拟时轨迹分析（Monocle2/Monocle3），展现基因随发育时间轴的表达模式演变。\n2. 建议控制展示基因数在 30-100 之间，若基因过多需设置 show_rownames = FALSE 并筛选 Top 标志基因标注。"
+    },
+    {
+      "id": "fig_time_series_line_03",
+      "title": "第6章 时间序列型图表",
+      "category": "数据关系",
+      "chart_type": "折线图",
+      "framework": "Python",
+      "packages": [
+        "matplotlib",
+        "seaborn",
+        "pandas",
+        "numpy"
+      ],
+      "tags": [
+        "折线图",
+        "时间序列",
+        "置信区间",
+        "多曲线"
+      ],
+      "description": "多变量时间序列走势图，包含均值折线与标准差/置信区间阴影带。",
+      "code": "import matplotlib.pyplot as plt\nimport seaborn as sns\nimport pandas as pd\n\n# 设置样式\nsns.set_theme(style=\"whitegrid\", font=\"sans-serif\")\nplt.figure(figsize=(10, 6), dpi=300)\n\n# 绘制带置信区间的折线图\nax = sns.lineplot(\n    data=df,\n    x=\"date\", y=\"value\", hue=\"category\",\n    style=\"category\", markers=True, dashes=False,\n    errorbar=(\"ci\", 95), linewidth=2.5\n)\n\nplt.title(\"多指标时间序列动态走势\", fontsize=14, fontweight='bold', pad=15)\nplt.xlabel(\"时间 (Time)\", fontsize=12)\nplt.ylabel(\"测量指标 (Metric)\", fontsize=12)\nplt.legend(title=\"类别\", frameon=True)\nplt.tight_layout()\nplt.savefig(\"time_series_output.png\", dpi=300)",
+      "sample_data": {
+        "format": "json",
+        "columns": [
+          "date",
+          "value",
+          "category"
+        ],
+        "preview": [
+          {
+            "date": "2026-01-01",
+            "value": 105.2,
+            "category": "Control"
+          },
+          {
+            "date": "2026-01-02",
+            "value": 112.8,
+            "category": "Treatment"
+          }
+        ]
+      },
+      "visual_rules": {
+        "palette": "Set2 / Colorblind-friendly",
+        "font_family": "DejaVu Sans",
+        "aspect_ratio": "5:3",
+        "theme": "sns.set_theme(style='whitegrid')",
+        "guidelines": "1. 置信区间阴影设置透明度 alpha=0.2；2. 针对离散采样点配置数据点标记 (markers=True)。"
+      },
+      "agent_context": "【Agent 绘图上下文与修改指导】\n1. 适用于连续时间点、实验周期或动态监测量（如动物体重变化、临床随访指标）。\n2. x 轴自动解析日期或数值点，若类别多于 5 个，建议改用面板分图 (facet_grid)。"
+    },
+    {
+      "id": "fig_density_mean_04",
+      "title": "密度图+分组标记+均值线",
+      "category": "数据分布",
+      "chart_type": "密度图",
+      "framework": "R",
+      "packages": [
+        "ggplot2",
+        "dplyr",
+        "gghalves"
+      ],
+      "tags": [
+        "密度图",
+        "数据分布",
+        "分组对比",
+        "均值线"
+      ],
+      "description": "多组数据重叠概率密度图，每组叠加虚线标示均值与文本注释。",
+      "code": "library(ggplot2)\nlibrary(dplyr)\n\n# 计算各组均值\nmu <- df %>%\n  group_by(group) %>%\n  summarise(grp.mean = mean(value))\n\n# 绘制密度图\nggplot(df, aes(x = value, fill = group, color = group)) +\n  geom_density(alpha = 0.4, linewidth = 0.8) +\n  geom_vline(data = mu, aes(xintercept = grp.mean, color = group),\n             linetype = \"dashed\", linewidth = 1) +\n  scale_fill_manual(values = c(\"#E69F00\", \"#56B4E9\", \"#009E73\")) +\n  scale_color_manual(values = c(\"#E69F00\", \"#56B4E9\", \"#009E73\")) +\n  labs(title = \"组间概率密度分布与均值对比\",\n       x = \"测量指标 (Body Mass)\", y = \"概率密度 (Density)\") +\n  theme_minimal(base_size = 14) +\n  theme(legend.position = \"top\")",
+      "sample_data": {
+        "format": "csv",
+        "columns": [
+          "group",
+          "value"
+        ],
+        "preview": [
+          {
+            "group": "Adelie",
+            "value": 3700
+          },
+          {
+            "group": "Chinstrap",
+            "value": 3733
+          },
+          {
+            "group": "Gentoo",
+            "value": 5076
+          }
+        ]
+      },
+      "visual_rules": {
+        "palette": "Okabe-Ito Colorblind Safe Palette",
+        "font_family": "Arial",
+        "aspect_ratio": "4:3",
+        "theme": "theme_minimal",
+        "guidelines": "1. 使用半透明 alpha (0.3-0.5) 避免重叠遮挡；2. 必须包含组均值虚线 (dashed vline)。"
+      },
+      "agent_context": "【Agent 绘图上下文与修改指导】\n1. 当用户需要对比 2-4 个平行组的概率分布形态及中心位置时最佳。\n2. 自动计算各组 Mean 或 Median 并标注垂直切线。"
+    },
+    {
+      "id": "fig_volcano_omics_05",
+      "title": "高水平发表级火山图 (Volcano Plot)",
+      "category": "组学研究",
+      "chart_type": "火山图",
+      "framework": "R",
+      "packages": [
+        "EnhancedVolcano",
+        "ggplot2",
+        "ggrepel"
+      ],
+      "tags": [
+        "火山图",
+        "组学研究",
+        "差异表达",
+        "转录组",
+        "Top基因标注"
+      ],
+      "description": "转录组/蛋白组差异分析标配火山图，清晰标注显著上调、下调基因及 Top Label。",
+      "code": "library(EnhancedVolcano)\n\nEnhancedVolcano(res,\n  lab = rownames(res),\n  x = 'log2FoldChange',\n  y = 'pvalue',\n  pCutoff = 10e-6,\n  FCcutoff = 1.5,\n  pointSize = 3.0,\n  labSize = 4.0,\n  col=c('black', 'black', 'blue', 'red'),\n  colAlpha = 0.8,\n  legendPosition = 'right',\n  title = '差异基因火山图 (Volcano Plot)',\n  subtitle = 'Significant Up/Down Regulated Genes'\n)",
+      "sample_data": {
+        "format": "csv",
+        "columns": [
+          "gene_symbol",
+          "log2FoldChange",
+          "pvalue",
+          "padj"
+        ],
+        "preview": [
+          {
+            "gene_symbol": "TP53",
+            "log2FoldChange": 2.8,
+            "pvalue": 1.2e-08,
+            "padj": 3.4e-07
+          },
+          {
+            "gene_symbol": "EGFR",
+            "log2FoldChange": -3.1,
+            "pvalue": 5.6e-09,
+            "padj": 1.1e-07
+          }
+        ]
+      },
+      "visual_rules": {
+        "palette": "Red (Up) / Blue (Down) / Grey (NS)",
+        "font_family": "Arial",
+        "aspect_ratio": "1:1",
+        "theme": "EnhancedVolcano_theme",
+        "guidelines": "1. 设置 log2FC cutoff (如 1.0 或 1.5) 与 p-value cutoff (如 0.05 或 1e-5)；2. 顶部显著基因使用 ggrepel 避让文本标签。"
+      },
+      "agent_context": "【Agent 绘图上下文与修改指导】\n1. RNA-seq / Proteomics / Metabolomics 差异表达分析的首选可视化方案。\n2. Agent 需要自动检测用户数据中的 log2FC 列和 pvalue/padj 列，并自动进行缺失值剔除。"
+    },
+    {
+      "id": "fig_raincloud_06",
+      "title": "云雨图 (Raincloud Plot - 半小提琴+箱线图+散点)",
+      "category": "类别比较",
+      "chart_type": "云雨图",
+      "framework": "R",
+      "packages": [
+        "ggplot2",
+        "ggdist",
+        "gghalves"
+      ],
+      "tags": [
+        "云雨图",
+        "类别比较",
+        "分布+散点",
+        "顶刊图表"
+      ],
+      "description": "结合半透明概率密度（云）、箱线图（中位数）与原始样本散点（雨滴）的高信息量比较图。",
+      "code": "library(ggplot2)\nlibrary(ggdist)\n\nggplot(df, aes(x = group, y = value, fill = group)) +\n  # 1. 云：密度图\n  stat_halfeye(\n    adjust = 0.5,\n    width = 0.6,\n    .width = 0,\n    justification = -0.2,\n    point_colour = NA\n  ) +\n  # 2. 箱线图\n  geom_boxplot(\n    width = 0.15,\n    outlier.shape = NA,\n    alpha = 0.5\n  ) +\n  # 3. 雨：散点\n  stat_dots(\n    side = \"left\",\n    justification = 1.1,\n    binwidth = 0.2\n  ) +\n  scale_fill_brewer(palette = \"Set2\") +\n  theme_minimal() +\n  labs(title = \"云雨图 (Raincloud Plot)\", x = \"实验组别\", y = \"测量值\")",
+      "sample_data": {
+        "format": "csv",
+        "columns": [
+          "group",
+          "value"
+        ],
+        "preview": [
+          {
+            "group": "Control",
+            "value": 15.2
+          },
+          {
+            "group": "Drug_A",
+            "value": 28.4
+          },
+          {
+            "group": "Drug_B",
+            "value": 34.1
+          }
+        ]
+      },
+      "visual_rules": {
+        "palette": "RColorBrewer Set2 / Pastel",
+        "font_family": "Arial",
+        "aspect_ratio": "4:3",
+        "theme": "theme_minimal",
+        "guidelines": "1. 密度分布靠右，原始点阵靠左；2. 展现真实数据样本量的同时兼顾总体分布形状。"
+      },
+      "agent_context": "【Agent 绘图上下文与修改指导】\n1. 适合替代传统柱状图/小提琴图，展示小样本到中样本数据（N=10~100）。\n2. 提供最全面的原始数据真实分布表达。"
+    },
+    {
+      "id": "fig_961f9a6e",
+      "title": "Python Seaborn 双曼哈顿图 (Manhattan Plot)",
+      "category": "组学研究",
+      "chart_type": "曼哈顿图",
+      "framework": "Python",
+      "packages": [],
+      "tags": [
+        "曼哈顿图",
+        "GWAS",
+        "组学研究",
+        "Python"
+      ],
+      "description": "用于全基因组关联分析 (GWAS) SNP 显著性分布的双向对比曼哈顿图。",
+      "code": "import seaborn as sns...",
+      "sample_data": {},
+      "visual_rules": {},
+      "agent_context": "暂无特定 Agent 上下文指导。"
+    },
+    {
+      "id": "fig_3f6ec8b1",
+      "title": "Python Seaborn 双曼哈顿图 (Manhattan Plot)",
+      "category": "组学研究",
+      "chart_type": "曼哈顿图",
+      "framework": "Python",
+      "packages": [],
+      "tags": [
+        "曼哈顿图",
+        "GWAS",
+        "组学研究",
+        "Python"
+      ],
+      "description": "用于全基因组关联分析 (GWAS) SNP 显著性分布的双向对比曼哈顿图。",
+      "code": "import seaborn as sns...",
+      "sample_data": {},
+      "visual_rules": {},
+      "agent_context": "暂无特定 Agent 上下文指导。"
+    }
+  ]
+}
