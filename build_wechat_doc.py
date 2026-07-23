@@ -1,5 +1,5 @@
 """
-Generate WeChat Official Article in DOCX format for PlotBase MCP.
+Generate WeChat Official Article in DOCX format for PlotBase MCP with embedded images.
 """
 
 import os
@@ -60,7 +60,6 @@ def add_code_block(doc, code_text):
     run.font.size = Pt(9.5)
     run.font.color.rgb = RGBColor(0x2D, 0x37, 0x48)
     
-    # Add spacing after table
     p_after = doc.add_paragraph()
     p_after.paragraph_format.space_before = Pt(0)
     p_after.paragraph_format.space_after = Pt(6)
@@ -73,7 +72,7 @@ def add_callout_box(doc, title, text):
     
     cell = tbl.cell(0, 0)
     cell.width = Inches(6.5)
-    set_cell_background(cell, "F0F9FF") # Light blue/cyan tint
+    set_cell_background(cell, "F0F9FF")
     set_cell_margins(cell, top=140, bottom=140, left=200, right=200)
     
     tcPr = cell._tc.get_or_add_tcPr()
@@ -105,6 +104,30 @@ def add_callout_box(doc, title, text):
     p_after = doc.add_paragraph()
     p_after.paragraph_format.space_after = Pt(6)
 
+def add_image_with_caption(doc, image_path, caption, width=Inches(5.8)):
+    """Embed an image with a centered caption."""
+    if not os.path.exists(image_path):
+        print(f"Warning: image path {image_path} not found")
+        return
+
+    p_img = doc.add_paragraph()
+    p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_img.paragraph_format.space_before = Pt(8)
+    p_img.paragraph_format.space_after = Pt(4)
+    
+    run_img = p_img.add_run()
+    run_img.add_picture(image_path, width=width)
+
+    p_cap = doc.add_paragraph()
+    p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_cap.paragraph_format.space_after = Pt(14)
+    
+    r_cap = p_cap.add_run(f"▲ {caption}")
+    r_cap.font.name = '宋体'
+    r_cap.font.size = Pt(9.5)
+    r_cap.font.italic = True
+    r_cap.font.color.rgb = RGBColor(0x64, 0x74, 0x8B)
+
 def build_document():
     doc = docx.Document()
 
@@ -130,7 +153,7 @@ def build_document():
     r_title.font.name = '微软雅黑'
     r_title.font.bold = True
     r_title.font.size = Pt(20)
-    r_title.font.color.rgb = RGBColor(0x1A, 0x36, 0x5D) # Deep Navy
+    r_title.font.color.rgb = RGBColor(0x1A, 0x36, 0x5D)
 
     # Subtitle
     p_sub = doc.add_paragraph()
@@ -193,7 +216,7 @@ def build_document():
 
     # Section 2: 制作档案 5 维结构
     h2 = doc.add_paragraph()
-    r_h2 = h2.add_run("二、解密 PlotBase-MCP 的 5 维图表制作档案")
+    r_h2 = h2.add_run("二、解密 PlotBase-MCP 的 5 维图表制作档案与架构")
     r_h2.font.name = '微软雅黑'
     r_h2.font.bold = True
     r_h2.font.size = Pt(15)
@@ -202,6 +225,14 @@ def build_document():
     h2.paragraph_format.space_after = Pt(8)
 
     doc.add_paragraph("PlotBase MCP 数据库将科研图表抽象为包含 5 个核心维度的结构化档案：")
+
+    # Embed Architecture Diagram
+    add_image_with_caption(
+        doc,
+        "/tmp/plotbase_mcp/images/fig1_architecture.png",
+        "图 1：PlotBase-MCP 架构设计与 5 维制作档案交互流程图",
+        width=Inches(6.0)
+    )
 
     # Table for 5 dimensions
     table = doc.add_table(rows=6, cols=3)
@@ -239,9 +270,9 @@ def build_document():
 
     doc.add_paragraph().paragraph_format.space_after = Pt(12)
 
-    # Section 3: 实战案例与代码示例
+    # Section 3: 实战案例与图表效果展示
     h3 = doc.add_paragraph()
-    r_h3 = h3.add_run("三、实战案例与代码示例展示")
+    r_h3 = h3.add_run("三、顶刊级科研图表渲染案例与代码展示")
     r_h3.font.name = '微软雅黑'
     r_h3.font.bold = True
     r_h3.font.size = Pt(15)
@@ -257,6 +288,13 @@ def build_document():
     r_c1_t.font.color.rgb = RGBColor(0x0D, 0x94, 0x88)
     p_c1.add_run("当研究包含多个平行处理组（>3组）且需展现连续分布趋势时，山脊图（Ridge Plot）是表现力极佳的选择：")
 
+    add_image_with_caption(
+        doc,
+        "/tmp/plotbase_mcp/images/fig2_ridge_plot.png",
+        "图 2：PlotBase-MCP 预置案例 —— 基于 viridis 配色与 ggridges 的多组连续分布山脊图效果",
+        width=Inches(5.5)
+    )
+
     code_ridge = """library(ggplot2)
 library(ggridges)
 library(viridis)
@@ -268,57 +306,79 @@ df <- read.csv("sample_density_data.csv")
 ggplot(df, aes(x = value, y = group, fill = ..x..)) +
   geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) +
   scale_fill_viridis(name = "Value", option = "C") +
-  labs(title = '多组连续数据分布山脊图',
-       subtitle = '基于 ggridges 与 viridis 色盘',
+  labs(title = '多组连续数据分布山脊图', subtitle = '基于 ggridges 与 viridis 色盘',
        x = '测定值 (Value)', y = '分组 (Group)') +
   theme_ridges(font_size = 13, grid = TRUE) +
-  theme(
-    legend.position = "right",
-    panel.spacing = unit(0.1, "lines")
-  )"""
+  theme(legend.position = "right", panel.spacing = unit(0.1, "lines"))"""
     add_code_block(doc, code_ridge)
 
-    # Case 2: 拟时热图
+    # Case 2: 火山图
     p_c2 = doc.add_paragraph()
-    r_c2_t = p_c2.add_run("案例 2：单细胞 RNA-seq 拟时序发育热图 (monocle2 + pheatmap)\n")
+    r_c2_t = p_c2.add_run("案例 2：高发表级转录组差异表达火山图 (EnhancedVolcano)\n")
     r_c2_t.font.bold = True
     r_c2_t.font.size = Pt(12)
     r_c2_t.font.color.rgb = RGBColor(0x0D, 0x94, 0x88)
-    p_c2.add_run("单细胞转录组分析中用于展现细胞发育轨迹和基因动态表达模式的顶刊热图模版：")
+    p_c2.add_run("转录组/蛋白组差异表达分析的标准可视化方案，清晰标记显著上调、下调基因及关键基因 Tag：")
 
-    code_heatmap = """library(monocle)
-library(pheatmap)
+    add_image_with_caption(
+        doc,
+        "/tmp/plotbase_mcp/images/fig3_volcano_plot.png",
+        "图 3：PlotBase-MCP 预置案例 —— 自动标注上/下调差异基因的发表级火山图渲染效果",
+        width=Inches(5.2)
+    )
 
-# 提取拟时序关键差异基因
-sig_gene_names <- row.names(subset(diff_test_res, qval < 0.01))
+    code_volcano = """library(EnhancedVolcano)
 
-# 绘制带有拟时序 (Pseudotime) 渐变标注的演变热图
-plot_pseudotime_heatmap(
-  cds[sig_gene_names,],
-  num_clusters = 4,
-  cores = 4,
-  show_rownames = TRUE,
-  return_heatmap = TRUE
+EnhancedVolcano(res,
+  lab = rownames(res),
+  x = 'log2FoldChange',
+  y = 'pvalue',
+  pCutoff = 10e-6,
+  FCcutoff = 1.5,
+  pointSize = 3.0,
+  labSize = 4.0,
+  col=c('black', 'black', 'blue', 'red'),
+  colAlpha = 0.8,
+  legendPosition = 'right',
+  title = '差异基因火山图 (Volcano Plot)',
+  subtitle = 'Significant Up/Down Regulated Genes'
 )"""
-    add_code_block(doc, code_heatmap)
+    add_code_block(doc, code_volcano)
 
-    # Case 3: 渲染适配示例
+    # Case 3: 时间序列图
     p_c3 = doc.add_paragraph()
-    r_c3_t = p_c3.add_run("案例 3：Agent 自动列名映射与代码渲染 (render_figure_template)\n")
+    r_c3_t = p_c3.add_run("案例 3：多指标动态时间序列走势图 (带 95% 置信区间阴影)\n")
     r_c3_t.font.bold = True
     r_c3_t.font.size = Pt(12)
     r_c3_t.font.color.rgb = RGBColor(0x0D, 0x94, 0x88)
-    p_c3.add_run("当用户传入列名映射字典 `{'value': 'ProteinExpression', 'group': 'CellState'}` 与色盘 `magma` 时，MCP 自动生成的定制代码：")
+    p_c3.add_run("适用于动物体重、基因表达随时间变化或临床随访等连续观测数据的折线趋势呈现：")
 
-    code_custom = """# [MCP 自动定制渲染输出]
-ggplot(df, aes(x = ProteinExpression, y = CellState, fill = ..x..)) +
-  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) +
-  scale_fill_viridis(name = "Value", option = "magma") +
-  labs(title = '单细胞蛋白表达量山脊图', x = 'ProteinExpression', y = 'CellState') +
-  theme_ridges(font_size = 13, grid = TRUE)"""
-    add_code_block(doc, code_custom)
+    add_image_with_caption(
+        doc,
+        "/tmp/plotbase_mcp/images/fig4_line_ci_plot.png",
+        "图 4：PlotBase-MCP 预置案例 —— Python (Seaborn) 带 95% 置信区间阴影的多组时间序列折线图",
+        width=Inches(5.5)
+    )
 
-    # Section 4: 快速接入指南
+    code_line = """import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+plt.figure(figsize=(8, 5), dpi=300)
+
+ax = sns.lineplot(
+    data=df, x="date", y="value", hue="category",
+    style="category", markers=True, dashes=False,
+    errorbar=("ci", 95), linewidth=2.5
+)
+plt.title("多指标时间序列动态走势", fontsize=14, fontweight='bold', pad=15)
+plt.xlabel("时间 (Time)", fontsize=12)
+plt.ylabel("测量指标 (Metric)", fontsize=12)
+plt.legend(title="类别", frameon=True)
+plt.tight_layout()"""
+    add_code_block(doc, code_line)
+
+    # Section 4: 接入指南
     h4 = doc.add_paragraph()
     r_h4 = h4.add_run("四、如何快速接入 PlotBase-MCP 服务？")
     r_h4.font.name = '微软雅黑'
@@ -348,7 +408,7 @@ ggplot(df, aes(x = ProteinExpression, y = CellState, fill = ..x..)) +
 }"""
     add_code_block(doc, code_mcp_config)
 
-    # Section 5: 总结与开源地址
+    # Section 5: 总结
     h5 = doc.add_paragraph()
     r_h5 = h5.add_run("五、总结与开源致谢")
     r_h5.font.name = '微软雅黑'
@@ -373,7 +433,7 @@ ggplot(df, aes(x = ProteinExpression, y = CellState, fill = ..x..)) +
 
     output_path = "/tmp/plotbase_mcp/PlotBase_MCP_微信公众号文章.docx"
     doc.save(output_path)
-    print(f"Successfully generated DOCX document at {output_path}")
+    print(f"Successfully generated DOCX document with embedded images at {output_path}")
 
 if __name__ == "__main__":
     build_document()
