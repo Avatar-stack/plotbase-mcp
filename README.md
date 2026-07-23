@@ -140,8 +140,6 @@ python3 /tmp/plotbase_mcp/test_server.py
 ├── server.py         # FastMCP 服务核心实现 (Tools, Resources, Prompts)
 ├── database.json     # 图表制作档案数据库 (含示例图表)
 ├── test_server.py    # 自动化单元测试套件
-├── generate_plots.py # DOCX 示例图表与架构图生成脚本
-├── images/           # 嵌入 DOCX 的高分辨率科研示意图
 └── README.md         # MCP 服务使用说明文档
 ```
 
